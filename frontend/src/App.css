@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
+
+#root {
+  max-width: 100vw;
+  max-height: 100vw;
+  margin: 0 auto;
+}
+
+
+.Text_view_primary.section-title {
+  font-size: 36px; /* Большой размер шрифта */
+  font-weight: bold; /* Жирный текст */
+  color: #214c88; /* Темно-синий цвет */
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Легкая тень для объема */
+  font-family: 'Poppins', sans-serif;
+}
+
+.gradient-box {
+  width: 100%; /* Растягиваем на всю ширину */
+  height: 200px; /* Высота блока */
+  background: linear-gradient(135deg, #25425f, #759ab2); /* Градиент от темно-синего к голубому */
+  border-radius: 10px; /* Скругление углов */
+  display: flex; /* Выравнивание содержимого */
+  color: white; /* Белый текст */
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.Text_view_primary.card-text {
+  color: white; /* Темно-синий цвет */
+}
+
+a:-webkit-any-link {
+  text-decoration:none !important;
+}
+
+.Text_view_secondary.card-text {
+  color: #bac2c4; /* Темно-синий цвет */
+}
