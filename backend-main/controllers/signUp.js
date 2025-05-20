@@ -5,30 +5,20 @@ const { ConflictError } = require("../errors/ConflictError");
 
 module.exports.createUser = (req, res, next) => {
   const {
-    name,
+    login,
     password,
     email,
-    lastName,
-    patronymic,
-    gender,
-    dateOfBirth,
     registrationDate,
-    rating,
   } = req.body;
 
   bcrypt
     .hash(password, 10)
     .then((hash) =>
       User.create({
-        name,
+        login,
         email,
         password: hash,
-        lastName,
-        patronymic,
-        gender,
-        dateOfBirth,
         registrationDate,
-        rating,
       })
     )
     .then((user) => {

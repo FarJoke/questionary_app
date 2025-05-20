@@ -3,12 +3,8 @@ const { dateRegex } = require("../utils/constants");
 
 const validateUserInfo = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    lastName: Joi.string().min(2).max(30),
-    patronymic: Joi.string().min(2).max(30),
+    login: Joi.string().min(2).max(30),
     email: Joi.string().required().email(),
-    dateOfBirth: Joi.string().required(),
-    gender: Joi.string().required(),
     password: Joi.string().required().min(6),
     registrationDate: Joi.date(),
   }),
@@ -23,12 +19,8 @@ const validateUserAuthentication = celebrate({
 
 const validateUserUpdate = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
+    login: Joi.string().min(2).max(30),
     email: Joi.string().required().email(),
-    lastName: Joi.string().min(2).max(30),
-    patronymic: Joi.string().min(2).max(30),
-    dateOfBirth: Joi.string().required(),
-    gender: Joi.string().required(),
   }),
 });
 
