@@ -22,10 +22,6 @@ const MainMenu= () => {
                 gap: 22,
                 boxShadow: "var(--shadow-group)"
             }}>
-                {/* <Layout direction='row' style={{alignItems: "center", gap: 10}}>
-                    <Avatar name="Oleg Dubovoy" size="l"/>
-                    <Text size="l">olegdubovoyy</Text>
-                </Layout> */}
                 <User  name="Oleg Dubovoy" size="l" info="olegdubovoyy@gmail.com" style={{padding: "0px 0px 0px 5px"}} />
                 <Layout style={{height: 25}}></Layout>
                 <Layout direction='column' style={{gap:5}}>
@@ -41,7 +37,6 @@ const MainMenu= () => {
                         <Button label={"Выйти"} size = "l" view='clear' style={{width: "100%", textAlign: "start", marginTop: "230%"}}></Button>
                     </Link>
                 </Layout>
-                
         </Layout>
     )
 }

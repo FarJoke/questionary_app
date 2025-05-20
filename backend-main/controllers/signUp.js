@@ -25,13 +25,8 @@ module.exports.createUser = (req, res, next) => {
       const { _id } = user;
       res.status(200).send({
         email,
-        name,
-        lastName,
-        patronymic,
-        gender,
-        dateOfBirth,
+        login,
         registrationDate,
-        rating,
         _id,
       });
     })

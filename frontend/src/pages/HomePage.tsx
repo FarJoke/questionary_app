@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Layout } from '@consta/uikit/Layout';
 import { Sidebar } from '@consta/uikit/Sidebar';
@@ -14,29 +14,9 @@ import { Link } from 'react-router-dom';
 
 const HomePage = () => {
 
-    const [value, setValue] = useState<string | null>(null);
-    const handleChange = ({ value }: { value: string | null }) => setValue(value);
-
-    const [isOpen, setIsOpen] = useState(false); // Состояние для управления видимостью меню
-
     return(
         <Layout direction="column" style={{height: "100%", width: "100%"}}>
-            <Layout style={{width: "100%", height: 80, padding: 25, alignItems: "center", justifyContent: 'space-between'}}>
-                <Layout style={{gap:10}}>    
-                    <TextField
-                        onChange={handleChange}
-                        value={value}
-                        type="text"
-                        placeholder="Поиск"
-                        style={{width: 400}}
-                    />
-                    <Button label="Поиск">
-
-                    </Button>
-                </Layout>
-                
-                <Text size='3xl' className="section-title">Мои опросы</Text>
-            </Layout>
+            
             <Layout style={{padding: 25, gap: 25}}>
                 <QuestionaryCard label={"Оценка корпоративной культуры"} subLabel={"Как вы оцениваете атмосферу, ценности и командный дух в компании?"}></QuestionaryCard>
                 <QuestionaryCard label={"Опрос 2"} subLabel={"Описание"}></QuestionaryCard>
