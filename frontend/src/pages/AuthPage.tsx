@@ -45,6 +45,7 @@ const AuthPage = ({setLogin}) => {
         setUserEmail("");
         setPassword("");
     }, []);
+    //код
 
     return(
     <Layout direction= "column" style={{alignItems: "center", width: "100%", height: "100%", paddingTop: "14%"}}>
