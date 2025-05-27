@@ -76,7 +76,7 @@ function App() {
               <Route
                 path="/"
                 element={
-                  <MainLayout/>
+                  <MainLayout curUser={currentUser}/>
                 }
               > 
                 <Route index element={<HomePage/>} />

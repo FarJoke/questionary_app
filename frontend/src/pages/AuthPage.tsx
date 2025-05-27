@@ -5,7 +5,6 @@ import { Button } from '@consta/uikit/Button'
 import { Avatar } from '@consta/uikit/Avatar';
 import { User } from '@consta/uikit/User';
 import { TextField } from '@consta/uikit/TextField';
-import QuestionaryCard from '../uicomponents/QuestionaryCard';
 import { Card } from '@consta/uikit/Card';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -45,7 +44,6 @@ const AuthPage = ({setLogin}) => {
         setUserEmail("");
         setPassword("");
     }, []);
-    //код
 
     return(
     <Layout direction= "column" style={{alignItems: "center", width: "100%", height: "100%", paddingTop: "14%"}}>

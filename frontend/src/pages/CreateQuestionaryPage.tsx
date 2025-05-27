@@ -7,7 +7,6 @@ import { Button } from '@consta/uikit/Button'
 import { Avatar } from '@consta/uikit/Avatar';
 import { User } from '@consta/uikit/User';
 import { TextField } from '@consta/uikit/TextField';
-import QuestionaryCard from '../uicomponents/QuestionaryCard';
 import { Card } from '@consta/uikit/Card';
 import { Steps } from '@consta/uikit/Steps';
 import { ProgressStepBar } from '@consta/uikit/ProgressStepBar';
@@ -67,7 +66,7 @@ const CreateQuestionaryPage = () => {
     const [endingDate, setEndingDate] = useState<Date | null>()
     
     return(
-        <Layout direction="column" style={{height: "100%", width: "100%", padding: "35px 160px 25px 160px", gap: 20}}>
+        <Layout direction="column" style={{height: "100%", width: "100%", padding: "35px 20% 25px 20%", gap: 20}}>
             <Layout flex = {1} direction="column" style={{width: "100%", alignContent: "center", alignItems: "center"}}>
                 <ProgressStepBar steps={steps} activeStepIndex={activeStep} style={{alignSelf: "center"}}/>
             </Layout>
@@ -117,23 +116,30 @@ const CreateQuestionaryPage = () => {
                   <Layout direction='column' style={{height: "100%", width: "100%",  overflowY: "auto", maxHeight: "80vh"}}>
                     <Text view="primary" size="2xl" style={{fontWeight: 600}}></Text>
                     <Layout direction='row' style={{height: "100%", width: "100%", paddingTop: "20px", gap: 20}}>
-                      <Layout direction='column' style={{height: "100%", width: "100%", gap: 30, padding: "0 120px 0 200px"}}>
+                      <Layout direction='column' style={{height: "100%", width: "100%", gap: 30, padding: "0 15% 0 15%"}}>
                         {questionlist.map((item)=>{
                           return(<Question number={item}></Question>)
                         })}
                         
-                        <Layout style={{height: 100, paddingBottom: 20}}>
+                        <Layout style={{width: "100%", height: 100, paddingBottom: 20}}>
                           <Button 
-                            style={{width: 800, height: 60, fontSize: 50, fontWeight: 200}} 
+                            style={{width: "100%", height: 60, fontSize: 50, fontWeight: 200}} 
                             view='ghost' 
                             label="+"
                             onClick={()=>{
                               const newQuest = questionlist[questionlist.length-1]+1
-                              console.log(questionlist[questionlist.length-1])
+  
                               setQuestionList([...questionlist, newQuest])
                             }}>
                           </Button>
                         </Layout>
+
+                    
+                          <Layout style={{ alignSelf: "flex-end", gap: 10}}>
+                            {/* <Button label="Назад" view= "secondary" onClick={()=>setActiveStep(1)}></Button> */}
+                            <Button label="Далее" onClick={()=>setActiveStep(2)}></Button>
+                          </Layout>
+                   
                         
                         
                       </Layout>
@@ -147,13 +153,27 @@ const CreateQuestionaryPage = () => {
                         <Button label="Назад" view= "secondary" onClick={()=>setActiveStep(0)}></Button>
                         <Button label="Далее" onClick={()=>setActiveStep(2)}></Button>
                       </Layout> */}
-                    </Layout>
-                    
+                    </Layout>                 
                     
                   </Layout>
                   : activeStep===2 ?
                   <Layout direction='column'>
-                    <Text view="primary">Предпросмотр анкеты</Text>
+                    <Layout direction='column' style={{height: "100%", width: "100%",  overflowY: "auto", maxHeight: "80vh"}}>
+                    <Text view="primary" size="2xl" style={{fontWeight: 600}}></Text>
+                    <Layout direction='row' style={{height: "100%", width: "100%", paddingTop: "20px", gap: 20}}>
+                      <Layout direction='column' style={{height: "100%", width: "100%", gap: 30, padding: "0 120px 0 300px"}}>
+                        
+        
+                        
+                        
+                      </Layout>
+                      <Layout direction='column' style={{height: "100%", width: "100%", gap: 30}}>
+                        
+                      </Layout>
+
+                    </Layout>
+                    
+                  </Layout>
                   </Layout> : ""
                 }
               </Layout>
