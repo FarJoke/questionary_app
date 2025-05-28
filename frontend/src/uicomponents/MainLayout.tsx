@@ -1,5 +1,4 @@
 import { Layout } from "@consta/uikit/Layout";
-import MainMenu from "./MainMenu";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 
