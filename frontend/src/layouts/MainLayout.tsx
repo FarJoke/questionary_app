@@ -1,6 +1,6 @@
 import { Layout } from "@consta/uikit/Layout";
 import { Outlet } from "react-router-dom";
-import Header from "./Header";
+import Header from "../uicomponents/Header";
 
 const MainLayout = ({curUser}) => {
     return(

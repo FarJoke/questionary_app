@@ -5,9 +5,8 @@ import { Layout } from '@consta/uikit/Layout'
 import './App.css'
 
 import HomePage from './pages/HomePage'
-import MainMenu from './uicomponents/MainMenu';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import MainLayout from './uicomponents/MainLayout';
+import MainLayout from './layouts/MainLayout';
 import CreateQuestionaryPage from './pages/CreateQuestionaryPage';
 import LoginPage from './pages/LoginPage';
 import AuthPage from './pages/AuthPage';
