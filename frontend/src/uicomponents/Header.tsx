@@ -24,7 +24,8 @@ const Header= ({userInfo}) => {
                 gap: 22,
                 boxShadow: "var(--shadow-group)"
             }}>
-                <User  name="Oleg Dubovoy" size="l" info="olegdubovoyy@gmail.com" style={{padding: "0px 0px 0px 20px"}} />
+                {userInfo&&
+                <User  name={userInfo.login} size="l" info={userInfo.email} style={{padding: "0px 0px 0px 20px", width: "15%"}} />}
             {/* <Text size='3xl' className="section-title">Мои опросы</Text> */}
                 <Layout style={{width: "100%", marginLeft: 30, alignItems: "center", justifyContent: 'space-between'}}>
                     <Layout style={{gap:10}}>    

@@ -27,6 +27,8 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (isLoggedIn) {
       Promise.all([userApi.getUserInfo()])
@@ -36,10 +38,12 @@ function App() {
         .catch((error) => {
           console.log(`Ошибка ${error}`);
         });
+    } else {
+      navigate("/auth");
     }
   }, [isLoggedIn]);
 
-  const navigate = useNavigate();
+  
   useEffect(() => {
     
     const handleTokenCheck = () => {
@@ -67,6 +71,7 @@ function App() {
   function handleLogin() {
     setIsLoggedIn(true);
   }
+  console.log(currentUser)
   return (
     <CurrentUserContext.Provider value={{ currentUser, setCurrentUser }}>
       <Theme preset={presetGpnDefault}>

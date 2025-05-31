@@ -1,186 +1,315 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Layout } from '@consta/uikit/Layout';
-import { Sidebar } from '@consta/uikit/Sidebar';
-import { Text } from '@consta/uikit/Text'
-import { Button } from '@consta/uikit/Button'
-import { Avatar } from '@consta/uikit/Avatar';
-import { User } from '@consta/uikit/User';
+import { Text } from '@consta/uikit/Text';
+import { Button } from '@consta/uikit/Button';
 import { TextField } from '@consta/uikit/TextField';
 import { Card } from '@consta/uikit/Card';
-import { Steps } from '@consta/uikit/Steps';
 import { ProgressStepBar } from '@consta/uikit/ProgressStepBar';
 import { Switch } from '@consta/uikit/Switch';
 import { DatePicker } from '@consta/uikit/DatePicker';
-import { Select } from '@consta/uikit/Select';
-import { Checkbox } from '@consta/uikit/Checkbox';
-import Question from '../uicomponents/Question';
 
+import Question from '../uicomponents/Question';
+import QuestionInAction from '../uicomponents/QuestionInAction';
+
+type QuestionarySettings = {
+  name: string;
+  description: string;
+  isAnonymous: boolean;
+  hasTimeLimit: boolean;
+  timeLimit: Date | null;
+  multipleAccess: boolean;
+  hasEndDate: boolean;
+  endDate: Date | null;
+};
+
+type Variant = {
+  id: number;
+  text: string;
+  checked: boolean;
+  dependsOnQuestionNumber?: number;
+};
+
+type QuestionData = {
+  number: number;
+  text: string;
+  type: { id: number; label: string };
+  isMultiple: boolean;
+  isLogic: boolean;
+  variants: Variant[];
+  sliderValue: number;
+  max: number;
+  step: number;
+  dependendByVariant?: number|null;
+};
 
 const CreateQuestionaryPage = () => {
+  const [status, setStatus] = useState<string>('normal');
+  const [activeStep, setActiveStep] = useState(0);
 
-      const [status, setStatus] = useState<string>('normal');
+  const steps = [
+    { label: 'Настройка опроса', point: 1, status, lineStatus: 'normal' },
+    { label: 'Создание вопросов', point: 2, status, lineStatus: 'normal' },
+    { label: 'Предпросмотр анкеты', point: 3, status, lineStatus: 'normal' },
+  ];
 
-      const [activeStep, setActiveStep] = useState(0)
+  const [questionarySettings, setQuestionarySettings] = useState<QuestionarySettings>({
+    name: '',
+    description: '',
+    isAnonymous: false,
+    hasTimeLimit: false,
+    timeLimit: null,
+    multipleAccess: false,
+    hasEndDate: false,
+    endDate: null,
+  });
 
-        const clickAction = () => {
-            setStatus(status === 'normal' ? 'success' : 'normal');
-        };
-            
-      const steps = [
-        {
-          label: 'Настройка опроса',
-          point: 1,
-          status,
-          lineStatus: 'normal',
-        },
-        {
-          label: 'Создание вопросов',
-          point: 2,
-          status,
-          lineStatus: 'normal',
-        },
-        {
-          label: 'Предпросмотр анкеты',
-          point: 3,
-          status,
-          lineStatus: 'normal',
-        }
-      ];
-
-    const [questionlist, setQuestionList] = useState([1])
+  const [answers, setAnswers] = useState({});
 
 
 
-    const [name, setName] = useState("")
-    const [descryption, setDescryption] = useState("")
+  const [questions, setQuestions] = useState<QuestionData[]>([
+    {
+      number: 1,
+      type: { label: 'Варианты ответа', id: 1 },
+      text: '',
+      isMultiple: true,
+      isLogic: false,
+      variants: [
+        { id: 1, text: '', checked: false, dependsOnQuestionNumber: -1 },
+        { id: 2, text: '', checked: true, dependsOnQuestionNumber: -1 },
+      ],
+      sliderValue: 0,
+      max: 0,
+      step: 1,
+      dependendByVariant: -1,
+    },
+  ]);
 
-    const [infMode, setInfMode] = useState(false)
-    const [timeSet, setTimeSet] = useState(false)
-    const [timeForQuetionary, setTimeForQuetionary] = useState<Date | null>()
+  useEffect(()=>{
+    console.log(answers)
+  }, [answers])
 
-    const [manyAccess, setManyAccess] = useState(false)
+  const shouldShowQuestion = (
+    question: QuestionData,
+    answers: { [questionNumber: number]: { label: string; id: number }[] }
+  ): boolean => {
+      const dependentVariantId = question.dependendByVariant;
 
-    const [isEndingDate, setIsEndingDate] = useState(false)
+      // Если у вопроса нет зависимости, показываем его
+      if (dependentVariantId == null || dependentVariantId < 0) return true;
 
-    const [endingDate, setEndingDate] = useState<Date | null>()
-    
-    return(
-        <Layout direction="column" style={{height: "100%", width: "100%", padding: "35px 20% 25px 20%", gap: 20}}>
-            <Layout flex = {1} direction="column" style={{width: "100%", alignContent: "center", alignItems: "center"}}>
-                <ProgressStepBar steps={steps} activeStepIndex={activeStep} style={{alignSelf: "center"}}/>
-            </Layout>
-            <Card style={{width: "100%", height: "100%", backgroundColor: "#e0e3e2"}}>
-              
-              <Layout style={{height: "100%", width: "100%", padding: 25}}>
-                {activeStep===0 ?
-                  <Layout direction='column' style={{height: "100%", width: "100%"}}>
-                    <Text view="primary" size="2xl" style={{fontWeight: 600}}>Новый опрос</Text>
-                    <Layout direction='row' style={{height: "100%", width: "100%", paddingTop: "20px", gap: 20}}>
-                      <Layout direction='column' style={{height: "100%", width: "100%", gap: 30}}>
-                        <TextField size="l" value={name} onChange={(e)=>{setName(e.value)}} label='Название' required>
-                        </TextField>
+      // Найти вопрос, от которого зависит этот вопрос
+      const dependencyQuestion = questions.find(q =>
+        q.variants?.some(v => v.id === dependentVariantId)
+      );
 
-                        <TextField label='Описание' value={descryption} onChange={(e)=>{setDescryption(e.value)}} type='textarea' rows={3}>
+      if (!dependencyQuestion) return true;
 
-                        </TextField>
+      const dependencyAnswers = answers[dependencyQuestion.number];
 
-                        <Switch label="Анонимный опрос" size="l" checked={infMode} onChange={(e)=>setInfMode(e.checked)}/>
-                        <Switch label="Ограничение по времени" size="l" checked={timeSet} onChange={(e)=>setTimeSet(e.checked)}/>
-                        {timeSet && 
-                          <DatePicker type="time" value={timeForQuetionary} onChange={(e)=>{setTimeForQuetionary(e.value)}}/>}
+      if (!dependencyAnswers || !Array.isArray(dependencyAnswers)) return false;
 
-                        <Switch label="Многократное прохождение" size="l" checked={manyAccess} onChange={(e)=>setManyAccess(e.checked)}/>
+      // Проверка: выбран ли зависимый вариант
+      return dependencyAnswers.some(answer => answer.id === dependentVariantId);
+  };
 
-                        <Switch label="Дата окончания опроса" size="l" checked={isEndingDate} onChange={(e)=>setIsEndingDate(e.checked)}/>
-                        {isEndingDate && 
-                          <DatePicker value={endingDate} onChange={(item)=>setEndingDate(item.value)} label='' minDate={new Date} />
-                        }
-                        
-                      </Layout>
-                      <Layout direction='column' style={{height: "100%", width: "100%", gap: 30}}>
-                        
-                      </Layout>
+  return (
+    <Layout direction="column" style={{ height: '100%', width: '100%', padding: '35px 20% 25px 20%', gap: 20 }}>
+      <Layout flex={1} direction="column" style={{ width: '100%', alignContent: 'center', alignItems: 'center' }}>
+        <ProgressStepBar steps={steps} activeStepIndex={activeStep} style={{ alignSelf: 'center' }} />
+      </Layout>
 
-                    </Layout>
-                    <Layout style={{ alignSelf: "flex-end", gap: 10}}>
-                      <Layout style={{ alignSelf: "flex-end", gap: 10}}>
-                        {/* <Button label="Назад" view= "secondary" onClick={()=>setActiveStep(1)}></Button> */}
-                        <Button label="Далее" onClick={()=>setActiveStep(1)}></Button>
-                      </Layout>
-                    </Layout>
-                    
-                    
-                  </Layout>
-                  : activeStep===1 ?
-                  <Layout direction='column' style={{height: "100%", width: "100%",  overflowY: "auto", maxHeight: "80vh"}}>
-                    <Text view="primary" size="2xl" style={{fontWeight: 600}}></Text>
-                    <Layout direction='row' style={{height: "100%", width: "100%", paddingTop: "20px", gap: 20}}>
-                      <Layout direction='column' style={{height: "100%", width: "100%", gap: 30, padding: "0 15% 0 15%"}}>
-                        {questionlist.map((item)=>{
-                          return(<Question number={item}></Question>)
-                        })}
-                        
-                        <Layout style={{width: "100%", height: 100, paddingBottom: 20}}>
-                          <Button 
-                            style={{width: "100%", height: 60, fontSize: 50, fontWeight: 200}} 
-                            view='ghost' 
-                            label="+"
-                            onClick={()=>{
-                              const newQuest = questionlist[questionlist.length-1]+1
-  
-                              setQuestionList([...questionlist, newQuest])
-                            }}>
-                          </Button>
-                        </Layout>
-
-                    
-                          <Layout style={{ alignSelf: "flex-end", gap: 10}}>
-                            {/* <Button label="Назад" view= "secondary" onClick={()=>setActiveStep(1)}></Button> */}
-                            <Button label="Далее" onClick={()=>setActiveStep(2)}></Button>
-                          </Layout>
-                   
-                        
-                        
-                      </Layout>
-                      <Layout direction='column' style={{height: "100%", width: "100%", gap: 30}}>
-                        
-                      </Layout>
-
-                    </Layout>
-                    <Layout style={{ alignSelf: "flex-end", gap: 10}}>
-                      {/* <Layout style={{ alignSelf: "flex-end", gap: 10}}>
-                        <Button label="Назад" view= "secondary" onClick={()=>setActiveStep(0)}></Button>
-                        <Button label="Далее" onClick={()=>setActiveStep(2)}></Button>
-                      </Layout> */}
-                    </Layout>                 
-                    
-                  </Layout>
-                  : activeStep===2 ?
-                  <Layout direction='column'>
-                    <Layout direction='column' style={{height: "100%", width: "100%",  overflowY: "auto", maxHeight: "80vh"}}>
-                    <Text view="primary" size="2xl" style={{fontWeight: 600}}></Text>
-                    <Layout direction='row' style={{height: "100%", width: "100%", paddingTop: "20px", gap: 20}}>
-                      <Layout direction='column' style={{height: "100%", width: "100%", gap: 30, padding: "0 120px 0 300px"}}>
-                        
-        
-                        
-                        
-                      </Layout>
-                      <Layout direction='column' style={{height: "100%", width: "100%", gap: 30}}>
-                        
-                      </Layout>
-
-                    </Layout>
-                    
-                  </Layout>
-                  </Layout> : ""
-                }
+      <Card style={{ width: '100%', height: '100%', backgroundColor: '#e0e3e2' }}>
+        <Layout style={{ height: '100%', width: '100%', padding: 25 }}>
+          {activeStep === 0 ? (
+            <Layout direction="column" style={{ height: '100%', width: '100%' }}>
+              <Text view="primary" size="2xl" style={{ fontWeight: 600 }}>
+                Новый опрос
+              </Text>
+              <Layout direction="row" style={{ width: '100%', paddingTop: '20px', gap: 20 }}>
+                <Layout direction="column" style={{ width: '100%', gap: 30 }}>
+                  <TextField
+                    size="l"
+                    value={questionarySettings.name}
+                    onChange={(e) =>
+                      setQuestionarySettings((prev) => ({ ...prev, name: e.value }))
+                    }
+                    label="Название"
+                    required
+                  />
+                  <TextField
+                    label="Описание"
+                    value={questionarySettings.description}
+                    onChange={(e) =>
+                      setQuestionarySettings((prev) => ({ ...prev, description: e.value }))
+                    }
+                    type="textarea"
+                    rows={3}
+                  />
+                  <Switch
+                    label="Анонимный опрос"
+                    size="l"
+                    checked={questionarySettings.isAnonymous}
+                    onChange={(e) =>
+                      setQuestionarySettings((prev) => ({ ...prev, isAnonymous: e.checked }))
+                    }
+                  />
+                  <Switch
+                    label="Ограничение по времени"
+                    size="l"
+                    checked={questionarySettings.hasTimeLimit}
+                    onChange={(e) =>
+                      setQuestionarySettings((prev) => ({ ...prev, hasTimeLimit: e.checked }))
+                    }
+                  />
+                  {questionarySettings.hasTimeLimit && (
+                    <DatePicker
+                      type="time"
+                      value={questionarySettings.timeLimit}
+                      onChange={(e) =>
+                        setQuestionarySettings((prev) => ({ ...prev, timeLimit: e.value }))
+                      }
+                    />
+                  )}
+                  <Switch
+                    label="Многократное прохождение"
+                    size="l"
+                    checked={questionarySettings.multipleAccess}
+                    onChange={(e) =>
+                      setQuestionarySettings((prev) => ({ ...prev, multipleAccess: e.checked }))
+                    }
+                  />
+                  <Switch
+                    label="Дата окончания опроса"
+                    size="l"
+                    checked={questionarySettings.hasEndDate}
+                    onChange={(e) =>
+                      setQuestionarySettings((prev) => ({ ...prev, hasEndDate: e.checked }))
+                    }
+                  />
+                  {questionarySettings.hasEndDate && (
+                    <DatePicker
+                      value={questionarySettings.endDate}
+                      onChange={(e) =>
+                        setQuestionarySettings((prev) => ({ ...prev, endDate: e.value }))
+                      }
+                      label=""
+                      minDate={new Date()}
+                    />
+                  )}
+                </Layout>
               </Layout>
 
-            </Card>
-        </Layout>
-    )
-}
+              <Layout style={{ alignSelf: 'flex-end', gap: 10 }}>
+                <Button label="Далее" onClick={() => setActiveStep(1)} />
+              </Layout>
+            </Layout>
+          ) : activeStep === 1 ? (
+            <Layout direction="column" style={{ height: '100%', width: '100%', overflowY: 'auto', maxHeight: '80vh' }}>
+              <Text view="primary" size="2xl" style={{ fontWeight: 600, paddingBottom: 20 }}>
+                Создание вопросов
+              </Text>
+              <Layout direction="column" style={{ width: '100%', gap: 30, padding: '0 15%' }}>
+                {questions.map((question, index) => (
+                  <Question
+                    key={question.number}
+                    number={question.number}
+                    questionData={question}
+                    onChange={(updatedQuestion:QuestionData) => {
+                      const updated = [...questions];
+                      updated[index] = updatedQuestion;
 
-export default CreateQuestionaryPage
+                      // Очистим все предыдущие зависимости
+                      updated.forEach((q) => {
+                        if (q.dependendByVariant !== null && q.dependendByVariant !== undefined) {
+                          q.dependendByVariant = null;
+                        }
+                      });
+
+                      // Переприсвоим зависимости
+                      updated.forEach((q) => {
+                        q.variants?.forEach((variant) => {
+                          if (variant.dependsOnQuestionNumber !== undefined) {
+                            const dependentQuestion = updated.find(
+                              (q2) => q2.number === variant.dependsOnQuestionNumber
+                            );
+                            if (dependentQuestion) {
+                              dependentQuestion.dependendByVariant = variant.id;
+                            }
+                          }
+                        });
+                      });
+
+                      setQuestions(updated);
+                    }}
+                    allQuestions={questions}
+                  />
+                ))}
+
+                <Button
+                  style={{ width: '100%', height: 60, fontSize: 50, fontWeight: 200 }}
+                  view="ghost"
+                  label="+"
+                  onClick={() => {
+                    const nextNumber = questions.length ? questions[questions.length - 1].number + 1 : 1;
+                    setQuestions([
+                      ...questions,
+                      {
+                        number: nextNumber,
+                        text: '',
+                        type: { id: 1, label: 'Варианты ответа' },
+                        variants: [{ id: Date.now(), text: '', checked: false,  }],
+                        isMultiple: false,
+                        isLogic: false,
+                        dependendByVariant: -1,
+                        sliderValue: 0,
+                        max: 5,
+                        step: 1,
+                      },
+                    ]);
+                  }}
+                />
+                <Layout style={{ alignSelf: 'flex-end', gap: 10 }}>
+                  <Button label="Далее" onClick={() => setActiveStep(2)} />
+                </Layout>
+              </Layout>
+            </Layout>
+          ) : activeStep === 2 ? (
+            <Layout direction="column" style={{ height: '100%', width: '100%', overflowY: 'auto', maxHeight: '80vh', gap: 20 }}>
+              <Text view="primary" size="2xl" style={{ fontWeight: 600 }}>Предпросмотр анкеты</Text>
+              <Layout direction="column" style={{ padding: '0 20%', gap: 20 }}>
+                <Card style={{ width: '100%', padding: 24, background: 'white' }}>
+                  <Layout direction="column" style={{ gap: 10 }}>
+                    <Text view="primary" size="l">Название: {questionarySettings.name}</Text>
+                    <Text view="primary" size="l">Описание: {questionarySettings.description}</Text>
+                  </Layout>
+                </Card>
+                {questions.filter(q => shouldShowQuestion(q, answers)).map((q) => (
+                  <QuestionInAction
+                    key={q.number}
+                    number={q.number}
+                    questionData={q}
+                    allAnswers={answers}
+                    onAnswerChange={(selected) => {
+                      setAnswers((prev) => ({
+                        ...prev,
+                        [q.number]: selected,
+                      }));
+                    }}
+                  />
+                ))}
+                <Layout style={{ alignSelf: 'flex-end', gap: 10 }}>
+                  <Button label="Назад" onClick={() => setActiveStep(1)} />
+                </Layout>
+              </Layout>
+                
+            </Layout>
+          ) : null}
+        </Layout>
+      </Card>
+    </Layout>
+  );
+};
+
+export default CreateQuestionaryPage;

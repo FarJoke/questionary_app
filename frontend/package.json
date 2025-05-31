@@ -2,7 +2,8 @@
   "name": "questionary",
   "private": true,
   "version": "0.0.0",
-  "type": "module","scripts": {
+  "type": "module",
+  "scripts": {
     "dev": "vite --port 3000",
     "build": "tsc && vite build",
     "preview": "vite preview --port 3000",
@@ -25,7 +26,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1",
     "react-tabulator": "^0.18.1",
-    "ui-theme-igc-effect": "^1.0.0"
+    "ui-theme-igc-effect": "^1.0.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@originjs/vite-plugin-federation": "^1.3.3",
