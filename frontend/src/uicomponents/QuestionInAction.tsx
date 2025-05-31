@@ -127,7 +127,6 @@ const QuestionInAction = ({ number, questionData, allAnswers, onAnswerChange }) 
               min={0}
               max={max}
               step={step}
-              //label="Выберите значение"
               view='division'
             />
           </>

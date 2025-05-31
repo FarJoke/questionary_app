@@ -120,7 +120,7 @@ const CreateQuestionaryPage = () => {
         <ProgressStepBar steps={steps} activeStepIndex={activeStep} style={{ alignSelf: 'center' }} />
       </Layout>
 
-      <Card style={{ width: '100%', height: '100%', backgroundColor: '#e0e3e2' }}>
+      <Card style={{ width: '100%', height: '90%', backgroundColor: '#e0e3e2' }}>
         <Layout style={{ height: '100%', width: '100%', padding: 25 }}>
           {activeStep === 0 ? (
             <Layout direction="column" style={{ height: '100%', width: '100%' }}>
@@ -206,7 +206,7 @@ const CreateQuestionaryPage = () => {
               </Layout>
             </Layout>
           ) : activeStep === 1 ? (
-            <Layout direction="column" style={{ height: '100%', width: '100%', overflowY: 'auto', maxHeight: '80vh' }}>
+            <Layout direction="column" style={{ height: '100%', width: '100%', overflowX: 'auto', maxHeight: '100%' }}>
               <Text view="primary" size="2xl" style={{ fontWeight: 600, paddingBottom: 20 }}>
                 Создание вопросов
               </Text>

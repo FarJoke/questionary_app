@@ -6,7 +6,7 @@ const MainLayout = ({curUser}) => {
     return(
       <Layout direction="column" style={{width: "100vw", height: "100vh", background: "#bac2c4"}}>
         <Header userInfo={curUser}/>
-        <Layout direction="column" style={{width: "100%"}}>
+        <Layout direction="column" style={{width: "100%", overflowY: "hidden"}}>
            <Outlet /> 
         </Layout>
         
