@@ -120,14 +120,15 @@ const QuestionInAction = ({ number, questionData, allAnswers, onAnswerChange }) 
 
         {type.id === 3 && (
           <>
-            <Text>Текущее значение: {sliderVal}</Text>
+            <Text>{sliderVal}</Text>
             <Slider
               value={sliderVal}
               onChange={(e) => setSliderVal(e.value)}
               min={0}
               max={max}
               step={step}
-              label="Выберите значение"
+              //label="Выберите значение"
+              view='division'
             />
           </>
         )}
