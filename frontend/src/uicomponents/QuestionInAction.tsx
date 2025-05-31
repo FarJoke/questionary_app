@@ -59,18 +59,28 @@ const QuestionInAction = ({ number, questionData, allAnswers, onAnswerChange }) 
   const radioItems = variants.map((v) => ({ label: v.text, id: v.id }));
 
   useEffect(() => {
-  if (type.id === 1) {
-    if (isMultiple) {
-      onAnswerChange(selectedValues);
-    } else if (singleValue !== null) {
-      onAnswerChange([singleValue]);
+    if (type.id === 1) {
+      if (isMultiple) {
+        onAnswerChange({
+          selectedVariants: selectedValues
+        });
+      } else if (singleValue !== null) {
+        onAnswerChange({
+          selectedVariants: [singleValue]
+        });
+      }
+    } else if (type.id === 2) {
+      onAnswerChange({
+        selectedVariants: [],
+        typedText: customAnswer
+      });
+    } else if (type.id === 3) {
+      onAnswerChange({
+        selectedVariants: [],
+        sliderValue: sliderVal
+      });
     }
-  } else if (type.id === 2) {
-    onAnswerChange([customAnswer]); // сохраняем текст как строку в массиве
-  } else if (type.id === 3) {
-    onAnswerChange([sliderVal]);
-  }
-}, [selectedValues, singleValue, customAnswer, sliderVal])
+  }, [selectedValues, singleValue, customAnswer, sliderVal]);
 
   return (
     <Card style={{ width: '100%', padding: 24, background: 'white' }}>

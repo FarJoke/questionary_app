@@ -11,6 +11,7 @@ import { DatePicker } from '@consta/uikit/DatePicker';
 
 import Question from '../uicomponents/Question';
 import QuestionInAction from '../uicomponents/QuestionInAction';
+import { questionsApi } from '../utils/Questions';
 
 type QuestionarySettings = {
   name: string;
@@ -67,7 +68,9 @@ const CreateQuestionaryPage = () => {
   const [answers, setAnswers] = useState({});
 
 
-
+  useEffect(()=>{
+    console.log(answers)
+  }, [])
   const [questions, setQuestions] = useState<QuestionData[]>([
     {
       number: 1,
@@ -301,6 +304,7 @@ const CreateQuestionaryPage = () => {
                 ))}
                 <Layout style={{ alignSelf: 'flex-end', gap: 10 }}>
                   <Button label="Назад" onClick={() => setActiveStep(1)} />
+                  <Button label="Подтвердить" onClick={() => questionsApi.postNewQuestionary(questionarySettings, questions)} />
                 </Layout>
               </Layout>
                 

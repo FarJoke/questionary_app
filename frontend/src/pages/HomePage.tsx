@@ -10,17 +10,33 @@ import { TextField } from '@consta/uikit/TextField';
 import QuestionaryCard from '../uicomponents/QuestionaryCard';
 import { Card } from '@consta/uikit/Card';
 import { Link } from 'react-router-dom';
+import { questionsApi } from '../utils/Questions';
 
 
 const HomePage = () => {
 
+    const [list, setList]= useState([])
+
+    useEffect(()=>{
+        questionsApi.getMyQuestionaries().then((resp)=>{setList(resp)})
+    }, [])
+    
+    console.log(list)
+    
+    
     return(
         <Layout direction="column" style={{height: "100%", width: "100%"}}>
             
-            <Layout style={{padding: 25, gap: 25}}>
-                <QuestionaryCard label={"Оценка корпоративной культуры"} subLabel={"Как вы оцениваете атмосферу, ценности и командный дух в компании?"}></QuestionaryCard>
-                <QuestionaryCard label={"Опрос 2"} subLabel={"Описание"}></QuestionaryCard>
-                <QuestionaryCard label={"Опрос 3"} subLabel={"Описание"}></QuestionaryCard>
+            <Layout style={{
+                padding: 25,
+                gap: 25,
+                flexWrap: 'wrap',
+                display: 'flex', // важно для переноса
+                justifyContent: 'flex-start', // чтобы не центрировались
+            }}>
+                {list.map((quest)=>{return(
+                    <QuestionaryCard label={quest.name} subLabel={quest.description}></QuestionaryCard>
+                )})}
                 <Card>
                     <Link to={`/create`}>
                         <Button size='l' style={{width: 280, height: 170, fontSize: 70, fontWeight: 200}} view='ghost' label={"+"}></Button>

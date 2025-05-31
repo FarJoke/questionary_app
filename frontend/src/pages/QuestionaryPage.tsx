@@ -5,6 +5,8 @@ import { Text } from '@consta/uikit/Text';
 import { Button } from '@consta/uikit/Button';
 
 import QuestionInAction from '../uicomponents/QuestionInAction';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { questionsApi } from '../utils/Questions';
 
 type Item = {
   label: string;
@@ -32,63 +34,79 @@ type QuestionData = {
 };
 
 const QuestionaryPage = () => {
-  const [answers, setAnswers] = useState<{ [questionNumber: number]: { label: string; id: number }[] }>({});
+  //const [answers, setAnswers] = useState<{ [questionNumber: number]: { label: string; id: number }[] }>({});
+  const [answers, setAnswers] = useState<{
+  [questionNumber: number]: {
+    selectedVariants: number[];
+    typedText?: string;
+    sliderValue?: number;
+  };
+}>({});
+
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
 
   // 🧪 Моковые данные анкеты
-  const questions: QuestionData[] = [
-    {
-      number: 1,
-      text: 'Какие цвета вам нравятся?',
-      type: { id: 1, label: 'Варианты ответа' },
-      isMultiple: true,
-      variants: [
-        { id: 101, text: 'Красный' },
-        { id: 102, text: 'Синий' },
-        { id: 103, text: 'Зелёный' },
-      ],
-    },
-    {
-      number: 2,
-      text: 'Почему вы выбрали синий?',
-      type: { id: 2, label: 'Текстовый ответ' },
-      dependendByVariant: 102, // показываем, если выбран синий (id = 102)
-    },
-    {
-      number: 3,
-      text: 'Насколько вы довольны цветами?',
-      type: { id: 3, label: 'Слайдер' },
-      sliderValue: 5,
-      max: 10,
-      step: 1,
-    },
-  ];
+  const [questions, setQuestions] = useState<QuestionData[]>([])
 
+  //questionsApi.fetchQuestionaryById(id).then((resp)=>{setQuestions(resp.questions)})
+  useEffect(()=>{
+    questionsApi.fetchQuestionaryById(id).then((resp)=>{setQuestions(resp.questions)})
+  }, [])
+
+  const handleSaveQuestions = () => {
+    try {
+        const payload = {
+        answers: Object.entries(answers).map(([questionNumber, data]) => ({
+            questionNumber: Number(questionNumber),
+            selectedVariants: data.selectedVariants || [],
+            typedText: data.typedText || '',
+            sliderValue: data.sliderValue || 0,
+        })),
+        };
+
+        const response = questionsApi.postAnswers(id, payload)
+
+        if (response) {
+            //alert("Ответы успешно сохранены!");
+        } else {
+            console.error("Ошибка при отправке ответов");
+        }
+    } catch (err) {
+        console.error(err);
+    }
+  }
   // 🔁 Проверка, показывать ли вопрос
   const shouldShowQuestion = (
-    question: QuestionData,
-    answers: { [questionNumber: number]: { label: string; id: number }[] }
-  ): boolean => {
-    const dependentVariantId = question.dependendByVariant;
+  question: QuestionData,
+  answers: {
+    [questionNumber: number]: {
+      selectedVariants: number[];
+      typedText?: string;
+      sliderValue?: number;
+    };
+  },
+  questions: QuestionData[]
+): boolean => {
+  const dependentVariantId = question.dependendByVariant;
 
-    if (dependentVariantId == null || dependentVariantId < 0) return true;
+  // Если у вопроса нет зависимости, показываем его
+  if (dependentVariantId == null || dependentVariantId < 0) return true;
 
-    const dependencyQuestion = questions.find((q) =>
-      q.variants?.some((v) => v.id === dependentVariantId)
-    );
+  // Найти вопрос, содержащий вариант с нужным ID
+  const dependencyQuestion = questions.find(q =>
+    q.variants?.some(v => v.id === dependentVariantId)
+  );
 
-    if (!dependencyQuestion) return true;
+  if (!dependencyQuestion) return true;
 
-    const dependencyAnswers = answers[dependencyQuestion.number];
+  const dependencyAnswer = answers[dependencyQuestion.number];
 
-    if (!dependencyAnswers || !Array.isArray(dependencyAnswers)) return false;
+  if (!dependencyAnswer) return false;
 
-    return dependencyAnswers.some((answer) => answer.id === dependentVariantId);
-  };
-
-  const handleSubmit = () => {
-    console.log('Ответы пользователя:', answers);
-    alert('Анкета отправлена! Проверьте консоль.');
-  };
+  // Проверяем, выбран ли нужный вариант
+  return (dependencyAnswer.selectedVariants || []).includes(dependentVariantId);
+};
 
   return (
     <Layout direction="column" style={{ padding: '40px 20%', gap: 24, overflowX: "auto", height: "100%"}}>
@@ -96,29 +114,27 @@ const QuestionaryPage = () => {
 
       <Card style={{ padding: 24, backgroundColor: '#e0e3e2' }}>
         <Layout direction="column" style={{ gap: 16}}>
-          {questions.filter((q) => shouldShowQuestion(q, answers)).map((q) => (
+          {questions.filter((q) => shouldShowQuestion(q, answers, questions)).map((q) => (
             <QuestionInAction
               key={q.number}
               number={q.number}
               questionData={q}
               allAnswers={answers}
-              onAnswerChange={(selected) => {
+              onAnswerChange={(data) => {
                 setAnswers((prev) => ({
-                  ...prev,
-                  [q.number]: selected.map((val: any) =>
-                    typeof val === 'object'
-                      ? val
-                      : typeof val === 'string'
-                      ? { label: val, id: -1 }
-                      : { label: '', id: val }
-                  ),
+                    ...prev,
+                    [q.number]: {
+                    selectedVariants: data.selectedVariants || [],
+                    typedText: data.typedText,
+                    sliderValue: data.sliderValue,
+                    },
                 }));
-              }}
+                }}
             />
           ))}
 
           <Layout style={{ marginTop: 20, justifySelf:"flex-end" }}>
-            <Button label="Отправить" onClick={handleSubmit} />
+            <Button label="Отправить" onClick={handleSaveQuestions} />
           </Layout>
         </Layout>
       </Card>
