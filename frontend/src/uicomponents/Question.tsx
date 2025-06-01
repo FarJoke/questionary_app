@@ -230,7 +230,7 @@ const Question = ({
               <Layout direction="row" style={{ gap: 10 }}>
                 <TextField
                   label="Максимальное значение"
-                  style={{ width: '30%' }}
+                  style={{ width: '40%' }}
                   value={numberForSliderValue.toString()}
                   onChange={(e) =>
                     setNumberForSliderValue(e.value ? parseFloat(e.value) : 0)

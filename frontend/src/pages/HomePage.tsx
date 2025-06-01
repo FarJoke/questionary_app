@@ -35,7 +35,7 @@ const HomePage = () => {
                 justifyContent: 'flex-start', // чтобы не центрировались
             }}>
                 {list.map((quest)=>{return(
-                    <QuestionaryCard label={quest.name} subLabel={quest.description}></QuestionaryCard>
+                    <QuestionaryCard label={quest.name} subLabel={quest.description} questData={quest}></QuestionaryCard>
                 )})}
                 <Card>
                     <Link to={`/create`}>

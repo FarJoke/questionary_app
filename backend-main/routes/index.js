@@ -10,6 +10,7 @@ const { createQuestionary } = require("../controllers/questionaryController");
 const { getQuestionariesByAuthor  } = require("../controllers/questionaryController");
 const { getQuestionaryById } = require("../controllers/questionaryController");
 const { submitAnswers } = require("../controllers/submitAnswers");
+const { getQuestionaryResults } = require("../controllers/submitAnswers");
 
 const { getUserById } = require("../controllers/user");
 const {
@@ -29,6 +30,7 @@ router.use(auth);
 router.use("/users", usersRouter);
 router.post("/questionary", createQuestionary);
 router.use("/myquestionaries", getQuestionariesByAuthor);
+router.get("/questionary/:id/results", getQuestionaryResults);
 router.use("*", () => {
   throw new NotFoundError("Ресурс не найден.");
 });

@@ -15,13 +15,13 @@
     return Promise.reject({ status: response.status, res: response });
   }
 
-    postNewQuestionary(questionarySettings, questions){
+    async postNewQuestionary(questionarySettings, questions){
         const fullQuestionary = {
             ...questionarySettings,
             questions: [...questions],
         };
         const token = localStorage.getItem("token");
-        fetch("http://localhost:4000/questionary", {
+        const response = await fetch("http://localhost:4000/questionary", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -30,7 +30,10 @@
             body: JSON.stringify(
                 fullQuestionary
             )
-            });   
+        })   
+        const data = await response.json();
+        console.log(data)
+        return data;
     } 
     
     async getMyQuestionaries(){
@@ -63,6 +66,19 @@
             });
         return response.json()
     };
+
+    async getResults(id){
+        const token = localStorage.getItem("token");
+        const res = await fetch(`http://localhost:4000/questionary/${id}/results`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            })
+        const data = await res.json();
+        return data;   
+    }
 
 
 }

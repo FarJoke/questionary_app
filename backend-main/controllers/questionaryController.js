@@ -34,8 +34,6 @@ module.exports.createQuestionary = async (req, res, next) => {
       link,
     });
 
-    res.status(201).json(newQuestionary);
-
 };
 
 module.exports.getQuestionariesByAuthor = async (req, res, next) => {

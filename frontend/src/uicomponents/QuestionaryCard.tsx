@@ -10,10 +10,10 @@ import { Card } from '@consta/uikit/Card';
 import { Link } from 'react-router-dom';
 
 
-const QuestionaryCard = ({label, subLabel}) => {
+const QuestionaryCard = ({label, subLabel, questData}) => {
 
     return(
-        <Link to={`/results`}>
+        <Link to={`/results?id=${questData._id}`}>
             <Card style={{width: 280, height: 170}} className={"gradient-box"}>
                 
                 

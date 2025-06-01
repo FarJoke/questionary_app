@@ -12,6 +12,7 @@ import { DatePicker } from '@consta/uikit/DatePicker';
 import Question from '../uicomponents/Question';
 import QuestionInAction from '../uicomponents/QuestionInAction';
 import { questionsApi } from '../utils/Questions';
+import { Modal } from '@consta/uikit/Modal';
 
 type QuestionarySettings = {
   name: string;
@@ -47,6 +48,10 @@ type QuestionData = {
 const CreateQuestionaryPage = () => {
   const [status, setStatus] = useState<string>('normal');
   const [activeStep, setActiveStep] = useState(0);
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const [resultInfo, setResultInfo] = useState(null)
 
   const steps = [
     { label: 'Настройка опроса', point: 1, status, lineStatus: 'normal' },
@@ -304,7 +309,7 @@ const CreateQuestionaryPage = () => {
                 ))}
                 <Layout style={{ alignSelf: 'flex-end', gap: 10 }}>
                   <Button label="Назад" onClick={() => setActiveStep(1)} />
-                  <Button label="Подтвердить" onClick={() => questionsApi.postNewQuestionary(questionarySettings, questions)} />
+                  <Button label="Подтвердить" onClick={() => questionsApi.postNewQuestionary(questionarySettings, questions).then((resp)=>{setResultInfo(resp.link); setIsModalOpen(true)})} />
                 </Layout>
               </Layout>
                 
@@ -312,6 +317,29 @@ const CreateQuestionaryPage = () => {
           ) : null}
         </Layout>
       </Card>
+       <Modal
+        isOpen={isModalOpen}
+        hasOverlay
+        onClickOutside={() => setIsModalOpen(false)}
+        onEsc={() => setIsModalOpen(false)}
+        style={{padding: 20, width: 600}}
+      >
+        <Text as="p" size="l" view="primary" lineHeight="m">
+          Анкета успешно создана и доступна по ссылке
+        </Text>
+        <TextField disabled  value={resultInfo ? resultInfo : ""} style={{paddingBottom: 20, width: "100%"}}>
+
+        </TextField>
+        <div>
+          <Button
+            size="m"
+            view="primary"
+            label="Закрыть"
+            width="default"
+            onClick={() => setIsModalOpen(false)}
+          />
+        </div>
+      </Modal>
     </Layout>
   );
 };
