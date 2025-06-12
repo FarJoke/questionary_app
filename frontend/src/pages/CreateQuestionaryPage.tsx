@@ -99,28 +99,35 @@ const CreateQuestionaryPage = () => {
   }, [answers])
 
   const shouldShowQuestion = (
-    question: QuestionData,
-    answers: { [questionNumber: number]: { label: string; id: number }[] }
-  ): boolean => {
-      const dependentVariantId = question.dependendByVariant;
+  question: QuestionData,
+  answers: {
+    [questionNumber: number]: {
+      selectedVariants: number[];
+      typedText?: string;
+      sliderValue?: number;
+    };
+  },
+  questions: QuestionData[]
+): boolean => {
+  const dependentVariantId = question.dependendByVariant;
 
-      // Если у вопроса нет зависимости, показываем его
-      if (dependentVariantId == null || dependentVariantId < 0) return true;
+  // Если у вопроса нет зависимости, показываем его
+  if (dependentVariantId == null || dependentVariantId < 0) return true;
 
-      // Найти вопрос, от которого зависит этот вопрос
-      const dependencyQuestion = questions.find(q =>
-        q.variants?.some(v => v.id === dependentVariantId)
-      );
+  // Найти вопрос, содержащий вариант с нужным ID
+  const dependencyQuestion = questions.find(q =>
+    q.variants?.some(v => v.id === dependentVariantId)
+  );
 
-      if (!dependencyQuestion) return true;
+  if (!dependencyQuestion) return true;
 
-      const dependencyAnswers = answers[dependencyQuestion.number];
+  const dependencyAnswer = answers[dependencyQuestion.number];
 
-      if (!dependencyAnswers || !Array.isArray(dependencyAnswers)) return false;
+  if (!dependencyAnswer) return false;
 
-      // Проверка: выбран ли зависимый вариант
-      return dependencyAnswers.some(answer => answer.id === dependentVariantId);
-  };
+  // Проверяем, выбран ли нужный вариант
+  return (dependencyAnswer.selectedVariants || []).includes(dependentVariantId);
+};
 
   return (
     <Layout direction="column" style={{ height: '100%', width: '100%', padding: '35px 20% 25px 20%', gap: 20 }}>
@@ -164,31 +171,6 @@ const CreateQuestionaryPage = () => {
                     }
                   />
                   <Switch
-                    label="Ограничение по времени"
-                    size="l"
-                    checked={questionarySettings.hasTimeLimit}
-                    onChange={(e) =>
-                      setQuestionarySettings((prev) => ({ ...prev, hasTimeLimit: e.checked }))
-                    }
-                  />
-                  {questionarySettings.hasTimeLimit && (
-                    <DatePicker
-                      type="time"
-                      value={questionarySettings.timeLimit}
-                      onChange={(e) =>
-                        setQuestionarySettings((prev) => ({ ...prev, timeLimit: e.value }))
-                      }
-                    />
-                  )}
-                  <Switch
-                    label="Многократное прохождение"
-                    size="l"
-                    checked={questionarySettings.multipleAccess}
-                    onChange={(e) =>
-                      setQuestionarySettings((prev) => ({ ...prev, multipleAccess: e.checked }))
-                    }
-                  />
-                  <Switch
                     label="Дата окончания опроса"
                     size="l"
                     checked={questionarySettings.hasEndDate}
@@ -209,7 +191,7 @@ const CreateQuestionaryPage = () => {
                 </Layout>
               </Layout>
 
-              <Layout style={{ alignSelf: 'flex-end', gap: 10 }}>
+              <Layout style={{ alignSelf: 'flex-end', gap: 10, paddingTop: 20 }}>
                 <Button label="Далее" onClick={() => setActiveStep(1)} />
               </Layout>
             </Layout>
@@ -293,7 +275,7 @@ const CreateQuestionaryPage = () => {
                     <Text view="primary" size="l">Описание: {questionarySettings.description}</Text>
                   </Layout>
                 </Card>
-                {questions.filter(q => shouldShowQuestion(q, answers)).map((q) => (
+                {questions.filter(q => shouldShowQuestion(q, answers, questions)).map((q) => (
                   <QuestionInAction
                     key={q.number}
                     number={q.number}

@@ -3,10 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import { Layout } from '@consta/uikit/Layout';
 import { Card } from '@consta/uikit/Card';
 import { Text } from '@consta/uikit/Text';
-import { ProgressStepBar } from '@consta/uikit/ProgressStepBar';
 import { ProgressSpin } from '@consta/uikit/ProgressSpin';
 
 import { questionsApi } from '../utils/Questions';
+import { TextField } from '@consta/uikit/TextField';
+import { Pie } from '@consta/charts/Pie';
+
 
 const ResultPage = () => {
   const [results, setResults] = useState<any>(null);
@@ -30,8 +32,9 @@ const ResultPage = () => {
       style={{
         height: '100%',
         width: '100%',
-        padding: '35px 160px 25px 160px',
+        padding: '35px 20% 25px 20%',
         gap: 20,
+        overflowX: "auto"
       }}
     >
       <Text size="2xl" weight="bold">
@@ -44,11 +47,8 @@ const ResultPage = () => {
           <Text>Нет данных по результатам.</Text>
         )}
 
-        {!loading &&
-          results &&
-          results.questions.map((q) => (
-            <Card
-              key={q.number}
+        {results && results.questions && results.questions[0] &&
+          <Card
               style={{
                 backgroundColor: 'white',
                 marginBottom: 24,
@@ -57,46 +57,94 @@ const ResultPage = () => {
             >
               <Layout direction="column" style={{gap:4}}>
                 <Text view="primary" size="l" weight="semibold">
-                  Вопрос {q.number}: {q.text}
+                  Опрос пройден {results.questions[0].sliderValues[0].count} раз(а)
                 </Text>
 
-                {/* Варианты с подсчётом */}
-                {q.variants?.length > 0 && (
-                  <Layout direction="column" style={{ marginTop: 8, gap: 4 }}>
-                    {q.variants.map((v) => (
-                      <Text key={v.id}>
-                        {v.text} — <strong>{v.count}</strong> ответ(ов)
-                      </Text>
-                    ))}
-                  </Layout>
-                )}
-
-                {/* Слайдер значения */}
-                {q.sliderValues?.length > 0 && (
-                  <Layout direction="column" style={{ marginTop: 12, gap: 4 }}>
-                    <Text weight="semibold">Значения слайдера:</Text>
-                    {q.sliderValues.map((sv, idx) => (
-                      <Text key={idx}>
-                        {sv.value} — <strong>{sv.count}</strong> раз(а)
-                      </Text>
-                    ))}
-                  </Layout>
-                )}
-
-                {/* Тексты свободного ввода */}
-                {q.texts?.length > 0 && (
-                  <Layout direction="column" style={{ marginTop: 12, gap: 4 }}>
-                    <Text weight="semibold">Свободные ответы:</Text>
-                    {q.texts.map((t, idx) => (
-                      <Text key={idx} view="secondary">
-                        «{t}»
-                      </Text>
-                    ))}
-                  </Layout>
-                )}
               </Layout>
-            </Card>
-          ))}
+            
+          </Card>
+        }
+
+        {!loading &&
+          results &&
+          results.questions.map((q) => {
+            console.log(q)
+            let data
+            if (q.variants?.length > 0 && q.variants[0].count !== 0) {
+              data = q.variants.map((v) => ({type: v.text, value: v.count}))
+            }
+            if (q.sliderValues?.length > 0 && (q.sliderValues[0].value !== 0 )) {
+              data = q.sliderValues.map((sv) => ({type: sv.value, value: sv.count}))
+            }
+            return(
+              <Card
+                key={q.number}
+                style={{
+                  backgroundColor: 'white',
+                  marginBottom: 24,
+                  padding: 16,
+                }}
+              >
+                <Layout direction="column" style={{gap:4, padding: 10}}>
+                  <Text view="primary" size="l" weight="semibold">
+                    Вопрос {q.number}: {q.text}
+                  </Text>
+
+                  {/* Варианты с подсчётом */}
+                  {q.variants?.length > 0 && q.variants[0].count !== 0 && (
+                    <Layout direction="column" style={{ marginTop: 8, gap: 4, padding: 5 }}>
+
+                      {data && 
+                        <Pie style={{
+                                width: "40%",
+                                height: '300px',
+                            }}
+                            data={data}
+                            angleField="value"
+                            colorField="type"
+                        />
+                      }
+                    </Layout>
+                  )}
+
+                  {/* Слайдер значения */}
+                  {q.sliderValues?.length > 0 && (q.sliderValues[0].value !== 0 ) && (
+                    <Layout direction="column" style={{ marginTop: 12, gap: 4 }}>
+                      <Text weight="semibold">Значения шкалы оценок:</Text>
+                        <Layout direction="column" style={{ marginTop: 8, gap: 4, padding: 5 }}>
+
+                        {data && 
+                          <Pie style={{
+                                  width: "40%",
+                                  height: '290px',
+                              }}
+                              data={data}
+                              angleField="value"
+                              colorField="type"
+                          />
+                        }
+                      </Layout>
+                    </Layout>
+                  )}
+
+                  {/* Тексты свободного ввода */}
+                  {q.texts?.length > 0 && (
+                    <Layout direction="column" style={{ marginTop: 12, gap: 4 }}>
+                      <Text weight="semibold">Свободные ответы:</Text>
+                      <Layout direction='column' style={{width: "100%", maxHeight: 200, overflowX: "auto", gap: 4}}>
+                        {q.texts.map((t, idx) => (
+                        <TextField key={idx} value={t}>
+
+                        </TextField>
+                      ))}
+                      </Layout>
+                      
+                    </Layout>
+                  )}
+                </Layout>
+              </Card>
+            )}
+          )}
       </Card>
     </Layout>
   );
