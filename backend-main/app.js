@@ -10,7 +10,7 @@ const { requestLogger, errorLogger } = require("./middlewares/logger");
 const path = require("path");
 const fileUpload = require("express-fileupload");
 
-const { PORT = 4000 } = process.env;
+//const { PORT = 4000 } = process.env;
 
 const app = express();
 
@@ -46,6 +46,13 @@ app.use(errorLogger);
 app.use(errors());
 app.use(handleError);
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
+// app.listen(PORT, () => {
+//   console.log(`App listening on port ${PORT}`);
+// });
+
+const PORT = 4000;
+const HOST = '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
+  console.log("Server is running at http://${HOST}:${PORT}");
 });

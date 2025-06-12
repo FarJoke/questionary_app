@@ -125,8 +125,18 @@ const CreateQuestionaryPage = () => {
 
   if (!dependencyAnswer) return false;
 
-  // Проверяем, выбран ли нужный вариант
-  return (dependencyAnswer.selectedVariants || []).includes(dependentVariantId);
+    let flag = false
+    //@ts-ignore
+    if (dependencyAnswer.selectedVariants[0]?.id === dependentVariantId) flag= true
+    //@ts-ignore
+    if (dependencyAnswer.selectedVariants[1]?.id === dependentVariantId) flag= true
+    //@ts-ignore
+    if (dependencyAnswer.selectedVariants[2]?.id === dependentVariantId) flag= true
+    //@ts-ignore
+    if (dependencyAnswer.selectedVariants[3]?.id === dependentVariantId) flag= true
+    //@ts-ignore
+    if (dependencyAnswer.selectedVariants[4]?.id === dependentVariantId) flag= true
+    return flag;
 };
 
   return (

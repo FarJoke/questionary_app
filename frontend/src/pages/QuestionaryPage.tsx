@@ -69,6 +69,7 @@ const QuestionaryPage = () => {
 
         if (response) {
             //alert("Ответы успешно сохранены!");
+            setFinishFlag(true)
         } else {
             console.error("Ошибка при отправке ответов");
         }
@@ -103,16 +104,29 @@ const QuestionaryPage = () => {
   const dependencyAnswer = answers[dependencyQuestion.number];
 
   if (!dependencyAnswer) return false;
-
-  // Проверяем, выбран ли нужный вариант
-  return (dependencyAnswer.selectedVariants || []).includes(dependentVariantId);
+  
+  let flag = false
+  //@ts-ignore
+  if (dependencyAnswer.selectedVariants[0]?.id === dependentVariantId) flag= true
+  //@ts-ignore
+  if (dependencyAnswer.selectedVariants[1]?.id === dependentVariantId) flag= true
+  //@ts-ignore
+  if (dependencyAnswer.selectedVariants[2]?.id === dependentVariantId) flag= true
+  //@ts-ignore
+  if (dependencyAnswer.selectedVariants[3]?.id === dependentVariantId) flag= true
+  //@ts-ignore
+  if (dependencyAnswer.selectedVariants[4]?.id === dependentVariantId) flag= true
+  return flag;
 };
+
+  const [finishFlag, setFinishFlag] = useState(false)
 
   return (
     <Layout direction="column" style={{ padding: '40px 20%', gap: 24, overflowX: "auto", height: "100%"}}>
       <Text view="primary" size="2xl" weight="bold">Анкета</Text>
 
       <Card style={{ padding: 24, backgroundColor: '#e0e3e2' }}>
+        {!finishFlag ?
         <Layout direction="column" style={{ gap: 16}}>
           {questions.filter((q) => shouldShowQuestion(q, answers, questions)).map((q) => (
             <QuestionInAction
@@ -137,6 +151,18 @@ const QuestionaryPage = () => {
             <Button label="Отправить" onClick={handleSaveQuestions} />
           </Layout>
         </Layout>
+        :
+          <Layout direction= "column" style={{gap: 20, height: "100%"}}>
+
+              <Text view='primary' size="2xl" style={{fontWeight: 600}}>
+                  Ваши ответы сохранены!
+              </Text>
+              <Text view='secondary' size="xl" style={{fontWeight: 600}}>
+                  Спасибо, что приняли участие в опросе!
+              </Text>    
+
+          </Layout>
+        }
       </Card>
     </Layout>
   );
